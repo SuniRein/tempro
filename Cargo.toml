@@ -1,0 +1,8 @@
+[package]
+name = "tempro"
+edition = "2024"
+version = "0.1.0"
+description = "A simple CLI tool to manage project templates."
+
+[dependencies]
+clap = { version = "4.5.37", features = ["derive"] }
