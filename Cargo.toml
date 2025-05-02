@@ -5,4 +5,7 @@ version = "0.1.0"
 description = "A simple CLI tool to manage project templates."
 
 [dependencies]
+anyhow = "1.0.98"
 clap = { version = "4.5.37", features = ["derive"] }
+serde = { version = "1.0.219", features = ["derive"] }
+toml = "0.8.22"
