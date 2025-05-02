@@ -1,12 +1,11 @@
-mod cli;
-mod file;
-mod template;
-
 use clap::Parser;
-use cli::{Cli, Command};
 
 use std::path::PathBuf;
 use std::process;
+
+use tempro::cli::{Cli, Command};
+use tempro::file;
+use tempro::template;
 
 fn get_all_template_paths(path: &PathBuf) -> Vec<PathBuf> {
     path.read_dir()
