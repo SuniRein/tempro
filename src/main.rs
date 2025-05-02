@@ -15,11 +15,9 @@ fn main() -> Result<()> {
 
     match &cli.command {
         Command::List(args) => command::handle_list_command(&home, args),
-        Command::Check(args) => {
-            if !command::handle_check_command(&home, args)? {
-                process::exit(1);
-            }
-            process::exit(0);
-        }
+        Command::Check(args) => match command::handle_check_command(&home, args)? {
+            true => process::exit(0),
+            false => process::exit(1),
+        },
     }
 }
