@@ -40,3 +40,83 @@ pub fn get_all_template_paths(home: &Path) -> Result<Vec<PathBuf>> {
 
     Ok(result)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    mod test_get_template_home {
+        use super::*;
+
+        use temp_env::with_vars;
+
+        const TEMPRO_HOME: &str = "/custom/tempro/home";
+        const XDG_CONFIG_HOME: &str = "/custom/xdg/config";
+        const HOME: &str = "/custom/home";
+
+        #[test]
+        fn with_tempro_home() {
+            with_vars(
+                [
+                    ("TEMPRO_HOME", Some(TEMPRO_HOME)),
+                    ("XDG_CONFIG_HOME", Some(XDG_CONFIG_HOME)),
+                    ("HOME", Some(HOME)),
+                ],
+                || {
+                    assert_eq!(
+                        get_template_home(),
+                        Some(PathBuf::from("/custom/tempro/home"))
+                    );
+                },
+            );
+        }
+
+        #[test]
+        fn fallback_xdg_config_home() {
+            with_vars(
+                [
+                    ("TEMPRO_HOME", None),
+                    ("XDG_CONFIG_HOME", Some(XDG_CONFIG_HOME)),
+                    ("HOME", Some(HOME)),
+                ],
+                || {
+                    assert_eq!(
+                        get_template_home(),
+                        Some(PathBuf::from("/custom/xdg/config/tempro"))
+                    );
+                },
+            );
+        }
+
+        #[test]
+        fn fallback_home() {
+            with_vars(
+                [
+                    ("TEMPRO_HOME", None),
+                    ("XDG_CONFIG_HOME", None),
+                    ("HOME", Some(HOME)),
+                ],
+                || {
+                    assert_eq!(
+                        get_template_home(),
+                        Some(PathBuf::from("/custom/home/.config/tempro"))
+                    );
+                },
+            );
+        }
+
+        #[test]
+        fn fail_to_determine() {
+            with_vars(
+                [
+                    ("TEMPRO_HOME", None::<&str>),
+                    ("XDG_CONFIG_HOME", None),
+                    ("HOME", None),
+                ],
+                || {
+                    assert_eq!(get_template_home(), None);
+                },
+            );
+        }
+    }
+}
