@@ -1,5 +1,5 @@
 use std::fs;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Result};
 use serde::{Deserialize, Serialize};
@@ -31,7 +31,7 @@ impl Template {
 
     const META_FILE: &'static str = "meta.toml";
 
-    pub fn read_from_path(path: &PathBuf) -> Result<Self> {
+    pub fn read_from_path(path: &Path) -> Result<Self> {
         let name = path
             .file_name()
             .and_then(|s| s.to_str())
