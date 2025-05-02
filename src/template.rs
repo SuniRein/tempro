@@ -6,19 +6,19 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug)]
 pub struct Template {
-    meta: Meta,
+    name: String,
     location: PathBuf,
+    meta: Meta,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
 struct Meta {
-    name: String,
     description: String,
 }
 
 impl Template {
     pub fn name(&self) -> &str {
-        &self.meta.name
+        &self.name
     }
 
     pub fn description(&self) -> &str {
@@ -32,6 +32,12 @@ impl Template {
     const META_FILE: &'static str = "meta.toml";
 
     pub fn read_from_path(path: &PathBuf) -> Result<Self> {
+        let name = path
+            .file_name()
+            .and_then(|s| s.to_str())
+            .ok_or_else(|| anyhow::anyhow!("failed to get template name from path"))?
+            .to_string();
+
         let meta_file = path.join(Self::META_FILE);
 
         let meta_content = fs::read_to_string(&meta_file)
@@ -41,8 +47,9 @@ impl Template {
             .with_context(|| format!("failed to parse meta file: {}", meta_file.display()))?;
 
         Ok(Template {
-            meta,
+            name,
             location: path.to_path_buf(),
+            meta,
         })
     }
 }
