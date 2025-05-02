@@ -29,3 +29,14 @@ pub struct CheckArgs {
     /// (leave empty to check all templates)
     pub name: Option<String>,
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn verify_cli() {
+        use clap::CommandFactory;
+        Cli::command().debug_assert();
+    }
+}
