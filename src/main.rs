@@ -1,5 +1,6 @@
 mod cli;
 mod file;
+mod template;
 
 use clap::Parser;
 use cli::Cli;
