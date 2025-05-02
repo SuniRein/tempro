@@ -1,6 +1,6 @@
-use clap::{Parser, Subcommand};
+use clap::{Args, Parser, Subcommand};
 
-#[derive(Parser, Debug)]
+#[derive(Debug, Parser)]
 #[command(version, about, long_about = None)]
 pub struct Cli {
     #[command(subcommand)]
@@ -10,5 +10,12 @@ pub struct Cli {
 #[derive(Debug, Subcommand)]
 pub enum Command {
     /// List all available templates
-    List,
+    List(ListArgs),
+}
+
+#[derive(Debug, Args)]
+pub struct ListArgs {
+    /// Show template information in a table
+    #[arg(short, long)]
+    pub table: bool,
 }

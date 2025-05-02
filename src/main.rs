@@ -3,7 +3,7 @@ mod file;
 mod template;
 
 use clap::Parser;
-use cli::Cli;
+use cli::{Cli, Command};
 
 use std::path::PathBuf;
 use std::process;
@@ -31,16 +31,44 @@ fn main() {
     });
 
     match &cli.command {
-        cli::Command::List => {
+        Command::List(args) => {
             let template_paths = get_all_template_paths(&path);
+
             let template_names = template_paths
                 .iter()
                 .filter_map(|p| p.file_name())
                 .filter_map(|s| s.to_str())
-                .collect::<Vec<_>>()
-                .join(" ");
+                .collect::<Vec<_>>();
 
-            println!("{template_names}");
+            if args.table {
+                let max_name_length = template_names.iter().map(|s| s.len()).max().unwrap_or(0);
+
+                println!(
+                    "{:<width$} {}",
+                    "Name",
+                    "Description",
+                    width = max_name_length
+                );
+
+                for template_path in &template_paths {
+                    match template::Template::read_from_path(template_path) {
+                        Ok(template) => {
+                            println!(
+                                "{:<width$} {}",
+                                template.name(),
+                                template.description(),
+                                width = max_name_length
+                            );
+                        }
+                        Err(e) => {
+                            eprintln!("Error reading template {}: {}", template_path.display(), e);
+                            process::exit(1);
+                        }
+                    }
+                }
+            } else {
+                println!("{}", template_names.join(" "));
+            }
         }
     }
 }
