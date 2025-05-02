@@ -11,6 +11,9 @@ pub struct Cli {
 pub enum Command {
     /// List all available templates
     List(ListArgs),
+
+    /// Check if a template is available
+    Check(CheckArgs),
 }
 
 #[derive(Debug, Args)]
@@ -18,4 +21,11 @@ pub struct ListArgs {
     /// Show template information in a table
     #[arg(short, long)]
     pub table: bool,
+}
+
+#[derive(Debug, Args)]
+pub struct CheckArgs {
+    /// The name of the template to check
+    /// (leave empty to check all templates)
+    pub name: Option<String>,
 }

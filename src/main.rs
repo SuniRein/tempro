@@ -70,5 +70,36 @@ fn main() {
                 println!("{}", template_names.join(" "));
             }
         }
+
+        Command::Check(args) => match &args.name {
+            Some(name) => match template::Template::read_from_path(&path.join(name)) {
+                Ok(template) => {
+                    println!("{} is available", template.name());
+                }
+                Err(e) => {
+                    eprintln!("Error reading template {}: {}", name, e);
+                    process::exit(1);
+                }
+            },
+            None => {
+                let template_paths = get_all_template_paths(&path);
+
+                for template_path in &template_paths {
+                    match template::Template::read_from_path(template_path) {
+                        Ok(template) => {
+                            println!("[Passed] {}", template.name());
+                        }
+                        Err(e) => {
+                            eprintln!(
+                                "[Failed] Error reading template {}: {}",
+                                template_path.display(),
+                                e
+                            );
+                            process::exit(1);
+                        }
+                    }
+                }
+            }
+        },
     }
 }
