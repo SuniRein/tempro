@@ -29,7 +29,7 @@ impl Template {
         &self.location
     }
 
-    const META_FILE: &'static str = "meta.toml";
+    pub const META_FILE: &'static str = "meta.toml";
 
     pub fn read_from_path(path: &Path) -> Result<Self> {
         let name = path
@@ -60,20 +60,10 @@ mod tests {
 
     use hamcrest2::prelude::*;
 
+    use crate::test_utils::TemplateDir;
+
     mod test_read_from_path {
         use super::*;
-
-        fn create_template_dir(name: &str) -> (tempfile::TempDir, PathBuf) {
-            let temp_dir = tempfile::tempdir().unwrap();
-            let template_dir = temp_dir.path().join(name);
-            fs::create_dir(&template_dir).unwrap();
-            (temp_dir, template_dir)
-        }
-
-        fn create_meta_file(dir: &Path, content: &str) {
-            let meta_file = dir.join(Template::META_FILE);
-            fs::write(&meta_file, content).unwrap();
-        }
 
         #[test]
         fn path_invalid() {
@@ -85,35 +75,33 @@ mod tests {
 
         #[test]
         fn meta_file_missing() {
-            let (_temp_dir, template_dir) = create_template_dir("test template");
-            assert_that!(Template::read_from_path(&template_dir), err());
+            let template_dir = TemplateDir::new("test template", None);
+            assert_that!(Template::read_from_path(template_dir.path()), err());
         }
 
         #[test]
         fn meta_file_is_invalid_toml() {
-            let (_temp_dir, template_dir) = create_template_dir("test template");
-            create_meta_file(&template_dir, "invalid toml content");
-
-            assert_that!(Template::read_from_path(&template_dir), err());
+            let template_dir = TemplateDir::new("test template", Some("invalid toml content"));
+            assert_that!(Template::read_from_path(template_dir.path()), err());
         }
 
         #[test]
         fn meta_file_missing_description_field() {
-            let (_temp_dir, template_dir) = create_template_dir("template");
-            create_meta_file(&template_dir, "title = \"no description\"");
-            assert_that!(Template::read_from_path(&template_dir), err());
+            let template_dir =
+                TemplateDir::new("test template", Some(r#"title = "no description""#));
+            assert_that!(Template::read_from_path(template_dir.path()), err());
         }
 
         #[test]
         fn valid_template() {
-            let (_temp_dir, template_dir) = create_template_dir("test template");
-            create_meta_file(&template_dir, "description = \"Test template\"");
+            let template_dir =
+                TemplateDir::new("test template", Some(r#"description = "Test template""#));
 
-            let template = Template::read_from_path(&template_dir).unwrap();
+            let template = Template::read_from_path(template_dir.path()).unwrap();
 
-            assert_eq!(template.name(), "test template");
+            assert_eq!(template.name(), template_dir.name());
             assert_eq!(template.description(), "Test template");
-            assert_eq!(template.location(), template_dir);
+            assert_eq!(template.location(), template_dir.path());
         }
     }
 }
