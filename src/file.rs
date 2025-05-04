@@ -1,7 +1,7 @@
 use std::env;
 use std::path::{Path, PathBuf};
 
-use anyhow::{Context, Result};
+use anyhow::{Context, Result, anyhow};
 
 /// Get the path to the template home.
 /// First, it checks if the `TEMPRO_HOME` environment variable is set.
@@ -24,21 +24,27 @@ pub fn get_template_home() -> Option<PathBuf> {
     Some(base.join("tempro"))
 }
 
-/// Get all template paths in the template home.
+/// Get all template names in the template home.
 /// Only directories are considered.
 /// It *does not* check if the template is valid.
-pub fn get_all_template_paths(home: &Path) -> Result<Vec<PathBuf>> {
-    let result = home
+pub fn get_all_template_names(home: &Path) -> Result<Vec<String>> {
+    let mut names = Vec::new();
+
+    for entry in home
         .read_dir()
         .with_context(|| format!("failed to read template home: {}", home.display()))?
-        .filter_map(|entry| {
-            let entry = entry.unwrap();
-            let path = entry.path();
-            if path.is_dir() { Some(path) } else { None }
-        })
-        .collect();
+    {
+        let entry = entry.with_context(|| "failed to read a directory entry")?;
+        if entry.path().is_dir() {
+            let os_name = entry.file_name();
+            let name = os_name
+                .into_string()
+                .map_err(|os| anyhow!("template name not valid UTF-8: {:?}", os))?;
+            names.push(name);
+        }
+    }
 
-    Ok(result)
+    Ok(names)
 }
 
 #[cfg(test)]
@@ -119,4 +125,6 @@ mod tests {
             );
         }
     }
+
+    mod test_get_all_template_names {}
 }

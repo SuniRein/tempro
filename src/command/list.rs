@@ -1,4 +1,4 @@
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
 use anyhow::Result;
 
@@ -7,41 +7,29 @@ use tempro::file;
 use tempro::template::Template;
 
 pub fn handle_list_command(home: &Path, args: &ListArgs) -> Result<()> {
-    let paths = file::get_all_template_paths(home)?;
+    let names = file::get_all_template_names(home)?;
 
     match args.table {
-        true => print_template_table(&paths)?,
-        false => print_template_names(&paths),
+        true => print_template_table(home, &names)?,
+        false => print_template_names(&names),
     }
 
     Ok(())
 }
 
-fn print_template_names(paths: &[PathBuf]) {
-    let names = paths
-        .iter()
-        .filter_map(|p| p.file_name())
-        .filter_map(|s| s.to_str())
-        .map(String::from)
-        .collect::<Vec<_>>();
-
+fn print_template_names(names: &[String]) {
     println!("{}", names.join(" "));
 }
 
-fn print_template_table(paths: &[PathBuf]) -> Result<()> {
-    let templates = paths
+fn print_template_table(home: &Path, names: &[String]) -> Result<()> {
+    let templates = names
         .iter()
-        .map(|path| Template::read_from_path(path))
+        .map(|name| Template::read_from_path(&home.join(name)))
         .collect::<Result<Vec<_>>>()?;
 
-    let max_name_length = templates.iter().map(|t| t.name().len()).max().unwrap_or(4);
+    let max_name_length = names.iter().map(|name| name.len()).max().unwrap_or(4);
 
-    println!(
-        "{:<width$} {}",
-        "Name",
-        "Description",
-        width = max_name_length
-    );
+    println!("{:<width$} Description", "Name", width = max_name_length);
 
     for template in templates {
         println!(
