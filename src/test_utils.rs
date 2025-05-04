@@ -5,17 +5,47 @@ use tempfile::TempDir;
 
 use crate::template::Template;
 
+#[derive(Debug)]
+pub struct TemplateHome {
+    home: TempDir,
+    dirs: Vec<TemplateDir>,
+}
+
+impl TemplateHome {
+    pub fn new() -> Self {
+        let home = tempfile::tempdir().expect("failed to create temp dir");
+        Self { home, dirs: vec![] }
+    }
+
+    pub fn single(name: &str, content: Option<&str>) -> Self {
+        let mut new = Self::new();
+        new.push(name, content);
+        new
+    }
+
+    pub fn push(&mut self, name: &str, content: Option<&str>) {
+        let template_dir = TemplateDir::new(self.home.path(), name, content);
+        self.dirs.push(template_dir);
+    }
+
+    pub fn path(&self) -> &Path {
+        self.home.path()
+    }
+
+    pub fn dirs(&self) -> &[TemplateDir] {
+        &self.dirs
+    }
+}
+
+#[derive(Debug, Clone)]
 pub struct TemplateDir {
-    _temp_dir: TempDir,
     name: String,
-    template_dir: PathBuf,
+    path: PathBuf,
 }
 
 impl TemplateDir {
-    pub fn new(name: &str, content: Option<&str>) -> Self {
-        let temp_dir = tempfile::tempdir().expect("failed to create temp dir");
-
-        let template_dir = temp_dir.path().join(name);
+    fn new(home: &Path, name: &str, content: Option<&str>) -> Self {
+        let template_dir = home.join(name);
         fs::create_dir(&template_dir).unwrap_or_else(|err| {
             panic!(
                 "failed to create template dir {}: {err}",
@@ -31,14 +61,13 @@ impl TemplateDir {
         }
 
         Self {
-            _temp_dir: temp_dir,
-            name: name.to_string(),
-            template_dir,
+            name: name.into(),
+            path: template_dir,
         }
     }
 
     pub fn path(&self) -> &Path {
-        &self.template_dir
+        &self.path
     }
 
     pub fn name(&self) -> &str {

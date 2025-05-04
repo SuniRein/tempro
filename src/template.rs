@@ -60,7 +60,7 @@ mod tests {
 
     use hamcrest2::prelude::*;
 
-    use crate::test_utils::TemplateDir;
+    use crate::test_utils::TemplateHome;
 
     mod test_read_from_path {
         use super::*;
@@ -75,33 +75,31 @@ mod tests {
 
         #[test]
         fn meta_file_missing() {
-            let template_dir = TemplateDir::new("test template", None);
-            assert_that!(Template::read_from_path(template_dir.path()), err());
+            let home = TemplateHome::single("test template", None);
+            assert_that!(Template::read_from_path(home.dirs()[0].path()), err());
         }
 
         #[test]
         fn meta_file_is_invalid_toml() {
-            let template_dir = TemplateDir::new("test template", Some("invalid toml content"));
-            assert_that!(Template::read_from_path(template_dir.path()), err());
+            let home = TemplateHome::single("test template", Some("invalid toml content"));
+            assert_that!(Template::read_from_path(home.dirs()[0].path()), err());
         }
 
         #[test]
         fn meta_file_missing_description_field() {
-            let template_dir =
-                TemplateDir::new("test template", Some(r#"title = "no description""#));
-            assert_that!(Template::read_from_path(template_dir.path()), err());
+            let home = TemplateHome::single("test template", Some(r#"title = "no description""#));
+            assert_that!(Template::read_from_path(home.dirs()[0].path()), err());
         }
 
         #[test]
         fn valid_template() {
-            let template_dir =
-                TemplateDir::new("test template", Some(r#"description = "Test template""#));
+            let home = TemplateHome::single("test template", Some(r#"description = "Test""#));
+            let dir = &home.dirs()[0];
+            let template = Template::read_from_path(dir.path()).unwrap();
 
-            let template = Template::read_from_path(template_dir.path()).unwrap();
-
-            assert_eq!(template.name(), template_dir.name());
-            assert_eq!(template.description(), "Test template");
-            assert_eq!(template.location(), template_dir.path());
+            assert_eq!(template.name(), dir.name());
+            assert_eq!(template.description(), "Test");
+            assert_eq!(template.location(), dir.path());
         }
     }
 }
