@@ -2,9 +2,9 @@ use std::path::Path;
 
 use anyhow::Result;
 
-use tempro::cli::ListArgs;
-use tempro::file;
-use tempro::template::Template;
+use crate::cli::ListArgs;
+use crate::file;
+use crate::template::Template;
 
 pub fn handle_list_command(home: &Path, args: &ListArgs) -> Result<()> {
     let names = file::get_all_template_names(home)?;

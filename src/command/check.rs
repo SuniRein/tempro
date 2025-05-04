@@ -2,9 +2,9 @@ use std::path::Path;
 
 use anyhow::Result;
 
-use tempro::cli::CheckArgs;
-use tempro::file;
-use tempro::template::Template;
+use crate::cli::CheckArgs;
+use crate::file;
+use crate::template::Template;
 
 pub fn handle_check_command(home: &Path, args: &CheckArgs) -> Result<bool> {
     match &args.name {

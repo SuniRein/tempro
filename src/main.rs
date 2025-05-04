@@ -1,11 +1,10 @@
-mod command;
-
 use std::process;
 
 use anyhow::{Result, anyhow};
 use clap::Parser;
 
 use tempro::cli::{Cli, Command};
+use tempro::command;
 use tempro::file;
 
 fn main() -> Result<()> {
