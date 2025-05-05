@@ -7,7 +7,8 @@ use crate::file;
 use crate::template::Template;
 
 pub fn handle_list_command(home: &Path, args: &ListArgs) -> Result<()> {
-    let names = file::get_all_template_names(home)?;
+    let mut names = file::get_all_template_names(home)?;
+    names.sort();
 
     match args.table {
         true => print_template_table(home, &names)?,
