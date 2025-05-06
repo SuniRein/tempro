@@ -29,11 +29,10 @@ impl<T: AsRef<Path> + Debug + Copy> Matcher<T> for FileExistMatcher {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-
     use googletest::matcher::MatcherResult;
-    use googletest::prelude::*;
     use tempfile::NamedTempFile;
+
+    use crate::test_utils::prelude::*;
 
     #[test]
     fn not_match_nonexist_path() -> Result<()> {
