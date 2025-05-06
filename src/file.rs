@@ -51,7 +51,7 @@ pub fn get_all_template_names(home: &Path) -> Result<Vec<String>> {
 mod tests {
     use super::*;
 
-    use hamcrest2::prelude::*;
+    use crate::test_utils::prelude::*;
 
     mod test_get_template_home {
         use super::*;
@@ -139,7 +139,6 @@ mod tests {
             let home = temp_dir.path();
 
             let result = get_all_template_names(home).unwrap();
-
             assert_that!(&result, empty());
         }
 
@@ -153,19 +152,13 @@ mod tests {
             fs::File::create(home.join("template_ignored")).unwrap();
 
             let result = get_all_template_names(home).unwrap();
-
-            assert_that!(&result, len(2));
-            assert_that!(
-                &result,
-                contains(vec!["template1".to_string(), "template2".to_string()])
-            );
-            assert_that!(&result, not(contains("template_ignored".to_string())));
+            assert_that!(result, {&"template1".to_string(), &"template2".to_string()});
         }
 
         #[test]
         fn invalid_home() {
             let result = get_all_template_names(Path::new("/invalid/path"));
-            assert_that!(result, err());
+            assert_that!(result, err(anything()));
         }
     }
 }

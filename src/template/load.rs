@@ -35,41 +35,43 @@ mod tests {
 
     use std::path::PathBuf;
 
-    use hamcrest2::prelude::*;
-
     use crate::test_utils::TemplateHome;
+    use crate::test_utils::prelude::*;
 
     #[test]
     fn path_invalid() {
-        assert_that!(Template::load(&PathBuf::from("/invalid/path/..")), err());
+        assert_that!(
+            Template::load(&PathBuf::from("/invalid/path/..")),
+            err(anything())
+        );
     }
 
     #[test]
     fn meta_file_missing() {
         let home = TemplateHome::single("test template", None);
-        assert_that!(Template::load(home.dirs()[0].path()), err());
+        assert_that!(Template::load(home.dirs()[0].path()), err(anything()));
     }
 
     #[test]
     fn meta_file_is_invalid_toml() {
         let home = TemplateHome::single("test template", Some("invalid toml content"));
-        assert_that!(Template::load(home.dirs()[0].path()), err());
+        assert_that!(Template::load(home.dirs()[0].path()), err(anything()));
     }
 
     #[test]
     fn meta_file_missing_description_field() {
         let home = TemplateHome::single("test template", Some(r#"title = "no description""#));
-        assert_that!(Template::load(home.dirs()[0].path()), err());
+        assert_that!(Template::load(home.dirs()[0].path()), err(anything()));
     }
 
-    #[test]
+    #[gtest]
     fn valid_template() {
         let home = TemplateHome::single("test template", Some(r#"description = "Test""#));
         let dir = &home.dirs()[0];
         let template = Template::load(dir.path()).unwrap();
 
-        assert_eq!(template.name(), dir.name());
-        assert_eq!(template.description(), "Test");
-        assert_eq!(template.location(), dir.path());
+        expect_eq!(template.name(), dir.name());
+        expect_eq!(template.description(), "Test");
+        expect_eq!(template.location(), dir.path());
     }
 }

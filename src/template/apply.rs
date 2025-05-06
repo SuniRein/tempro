@@ -51,10 +51,10 @@ mod tests {
     use std::fs;
     use std::path::PathBuf;
 
-    use hamcrest2::prelude::*;
     use tempfile::TempDir;
 
     use crate::test_utils::TemplateHome;
+    use crate::test_utils::prelude::*;
 
     fn setup_home() -> (TemplateHome, Template) {
         let home = TemplateHome::single("test template", Some(r#"description = "Test""#));
@@ -86,11 +86,11 @@ mod tests {
         let (_temp_dir, target_path) = setup_target();
         template.apply(&target_path).unwrap();
 
-        assert_that!(&target_path, path_exists());
-        assert_that!(&target_path.join("file.txt"), file_exists());
-        assert_that!(&target_path.join("another_file.txt"), file_exists());
-        assert_that!(&target_path.join("dir"), path_exists());
-        assert_that!(&target_path.join("dir").join("file.txt"), file_exists());
+        assert_that!(&target_path, dir_exist());
+        assert_that!(&target_path.join("file.txt"), file_exist());
+        assert_that!(&target_path.join("another_file.txt"), file_exist());
+        assert_that!(&target_path.join("dir"), dir_exist());
+        assert_that!(&target_path.join("dir").join("file.txt"), file_exist());
 
         assert_eq!(
             fs::read_to_string(target_path.join("file.txt")).unwrap(),
@@ -112,7 +112,7 @@ mod tests {
         let template = Template::load(home.dirs()[0].path()).unwrap();
         let (_temp_dir, target_path) = setup_target();
 
-        assert_that!(template.apply(&target_path), err());
+        assert_that!(template.apply(&target_path), err(anything()));
     }
 
     #[test]
@@ -126,7 +126,7 @@ mod tests {
         let template = Template::load(home.dirs()[0].path()).unwrap();
         let (_temp_dir, target_path) = setup_target();
 
-        assert_that!(template.apply(&target_path), err());
+        assert_that!(template.apply(&target_path), err(anything()));
     }
 
     #[test]
@@ -135,7 +135,7 @@ mod tests {
         let (_temp_dir, target_path) = setup_target();
         fs::write(&target_path, "some content").unwrap();
 
-        assert_that!(template.apply(&target_path), err());
+        assert_that!(template.apply(&target_path), err(anything()));
     }
 
     #[test]
@@ -144,6 +144,6 @@ mod tests {
         let (_temp_dir, target_path) = setup_target();
         fs::create_dir(&target_path).unwrap();
 
-        assert_that!(template.apply(&target_path), err());
+        assert_that!(template.apply(&target_path), err(anything()));
     }
 }

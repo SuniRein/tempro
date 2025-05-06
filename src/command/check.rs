@@ -60,9 +60,9 @@ mod tests {
     use super::*;
 
     use anyhow::anyhow;
-    use hamcrest2::prelude::*;
 
     use crate::test_utils::TemplateHome;
+    use crate::test_utils::prelude::*;
 
     fn setup() -> TemplateHome {
         let mut home = TemplateHome::new();
@@ -147,7 +147,7 @@ mod tests {
             };
 
             let result = handle_check_command(home.path(), &args);
-            assert_that!(&result, ok());
+            assert_that!(&result, ok(()));
         }
 
         #[test]
@@ -158,7 +158,7 @@ mod tests {
             };
 
             let result = handle_check_command(home.path(), &args);
-            assert_that!(result, err());
+            assert_that!(result, err(anything()));
         }
 
         #[test]
@@ -170,7 +170,7 @@ mod tests {
             let args = CheckArgs { name: None };
 
             let result = handle_check_command(home.path(), &args);
-            assert_that!(result, ok());
+            assert_that!(result, ok(()));
         }
 
         #[test]
@@ -179,7 +179,7 @@ mod tests {
             let args = CheckArgs { name: None };
 
             let result = handle_check_command(home.path(), &args);
-            assert_that!(result, err());
+            assert_that!(result, err(anything()));
         }
     }
 }

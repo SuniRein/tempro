@@ -22,10 +22,10 @@ mod tests {
     use std::fs;
     use std::path::PathBuf;
 
-    use hamcrest2::prelude::*;
     use tempfile::TempDir;
 
     use crate::test_utils::TemplateHome;
+    use crate::test_utils::prelude::*;
 
     fn setup_home() -> TemplateHome {
         let home = TemplateHome::single("test template", Some(r#"description = "Test template""#));
@@ -60,11 +60,11 @@ mod tests {
         };
         handle_apply_command(home.path(), &args).unwrap();
 
-        assert_that!(&target, dir_exists());
-        assert_that!(&target.join("file1"), file_exists());
-        assert_that!(&target.join("file2"), file_exists());
-        assert_that!(&target.join("dir"), dir_exists());
-        assert_that!(&target.join("dir").join("file3"), file_exists());
+        assert_that!(&target, dir_exist());
+        assert_that!(&target.join("file1"), file_exist());
+        assert_that!(&target.join("file2"), file_exist());
+        assert_that!(&target.join("dir"), dir_exist());
+        assert_that!(&target.join("dir").join("file3"), file_exist());
         assert_eq!(
             fs::read_to_string(target.join("file1")).unwrap(),
             "some content1"
