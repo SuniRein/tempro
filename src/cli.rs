@@ -14,6 +14,9 @@ pub enum Command {
 
     /// Check if a template is available
     Check(CheckArgs),
+
+    /// Apply a template in the given directory
+    Apply(ApplyArgs),
 }
 
 #[derive(Debug, Args)]
@@ -28,6 +31,15 @@ pub struct CheckArgs {
     /// The name of the template to check
     /// (leave empty to check all templates)
     pub name: Option<String>,
+}
+
+#[derive(Debug, Args)]
+pub struct ApplyArgs {
+    /// The name of the template to apply
+    pub name: String,
+
+    /// The directory to apply the template in
+    pub target: String,
 }
 
 #[cfg(test)]

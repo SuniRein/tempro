@@ -13,5 +13,6 @@ fn main() -> Result<()> {
     match &cli.command {
         Command::List(args) => command::handle_list_command(&home, args),
         Command::Check(args) => command::handle_check_command(&home, args),
+        Command::Apply(args) => command::handle_apply_command(&home, args),
     }
 }
