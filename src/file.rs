@@ -1,7 +1,7 @@
 use std::env;
 use std::path::{Path, PathBuf};
 
-use anyhow::{Context, Result, anyhow, bail};
+use anyhow::{Context, Result, anyhow};
 
 /// Get the path to the template home.
 /// First, it checks if the `TEMPRO_HOME` environment variable is set.
@@ -45,37 +45,6 @@ pub fn get_all_template_names(home: &Path) -> Result<Vec<String>> {
     }
 
     Ok(names)
-}
-
-pub fn copy_dir(src: &Path, dst: &Path) -> Result<()> {
-    if !src.is_dir() {
-        bail!("source path {} is not a directory", src.display());
-    }
-
-    if dst.exists() {
-        bail!("destination path {} already exists", dst.display());
-    }
-
-    std::fs::create_dir_all(dst)
-        .with_context(|| format!("failed to create directory: {}", dst.display()))?;
-
-    for entry in src
-        .read_dir()
-        .with_context(|| format!("failed to read source directory: {}", src.display()))?
-    {
-        let entry = entry.with_context(|| "failed to read a directory entry")?;
-        let src_path = entry.path();
-        let dst_path = dst.join(entry.file_name());
-
-        if src_path.is_dir() {
-            copy_dir(&src_path, &dst_path)?;
-        } else {
-            std::fs::copy(&src_path, &dst_path)
-                .with_context(|| format!("failed to copy file: {}", src_path.display()))?;
-        }
-    }
-
-    Ok(())
 }
 
 #[cfg(test)]

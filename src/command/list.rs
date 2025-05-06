@@ -48,7 +48,7 @@ fn print_template_table<W: Write>(writer: &mut W, home: &Path, names: &[String])
     }
 
     for name in names {
-        let template = Template::read_from_path(&home.join(name))?;
+        let template = Template::load(&home.join(name))?;
         writeln!(
             writer,
             "{:<width$} {}",

@@ -50,7 +50,7 @@ fn check_templates(home: &Path, names: &[String]) -> Vec<CheckResult> {
         .iter()
         .map(|name| CheckResult {
             name: name.clone(),
-            result: Template::read_from_path(&home.join(name)).map(|_| ()),
+            result: Template::load(&home.join(name)).map(|_| ()),
         })
         .collect()
 }
