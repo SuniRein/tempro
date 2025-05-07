@@ -67,7 +67,7 @@ mod tests {
         fs::write(template_dir.join("another_file.txt"), "Ohter content").unwrap();
 
         fs::create_dir(template_dir.join("dir")).unwrap();
-        fs::write(template_dir.join("dir").join("file.txt"), "Some content").unwrap();
+        fs::write(template_dir.join("dir/file.txt"), "Some content").unwrap();
 
         let template = Template::load(template_path).unwrap();
 
@@ -80,30 +80,17 @@ mod tests {
         (temp_dir, target_path)
     }
 
-    #[test]
+    #[gtest]
     fn it_works() {
         let (_home, template) = setup_home();
         let (_temp_dir, target_path) = setup_target();
         template.apply(&target_path).unwrap();
 
-        assert_that!(&target_path, dir_exist());
-        assert_that!(&target_path.join("file.txt"), file_exist());
-        assert_that!(&target_path.join("another_file.txt"), file_exist());
+        assert_that!(target_path, dir_exist());
+        expect_that!(target_path.join("file.txt"), file("Some content"));
+        expect_that!(target_path.join("another_file.txt"), file("Ohter content"));
         assert_that!(&target_path.join("dir"), dir_exist());
-        assert_that!(&target_path.join("dir").join("file.txt"), file_exist());
-
-        assert_eq!(
-            fs::read_to_string(target_path.join("file.txt")).unwrap(),
-            "Some content"
-        );
-        assert_eq!(
-            fs::read_to_string(target_path.join("another_file.txt")).unwrap(),
-            "Ohter content"
-        );
-        assert_eq!(
-            fs::read_to_string(target_path.join("dir").join("file.txt")).unwrap(),
-            "Some content"
-        );
+        expect_that!(&target_path.join("dir/file.txt"), file("Some content"));
     }
 
     #[test]

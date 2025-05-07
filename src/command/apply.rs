@@ -46,7 +46,7 @@ mod tests {
         (temp_dir, target)
     }
 
-    #[test]
+    #[gtest]
     fn it_works() {
         let home = setup_home();
         let (temp_dir, target) = setup_target();
@@ -60,21 +60,9 @@ mod tests {
         handle_apply_command(home.path(), &args).unwrap();
 
         assert_that!(&target, dir_exist());
-        assert_that!(&target.join("file1"), file_exist());
-        assert_that!(&target.join("file2"), file_exist());
+        expect_that!(&target.join("file1"), file("some content1"));
+        expect_that!(&target.join("file2"), file("some content2"));
         assert_that!(&target.join("dir"), dir_exist());
-        assert_that!(&target.join("dir").join("file3"), file_exist());
-        assert_eq!(
-            fs::read_to_string(target.join("file1")).unwrap(),
-            "some content1"
-        );
-        assert_eq!(
-            fs::read_to_string(target.join("file2")).unwrap(),
-            "some content2"
-        );
-        assert_eq!(
-            fs::read_to_string(target.join("dir").join("file3")).unwrap(),
-            "some content3"
-        );
+        expect_that!(&target.join("dir/file3"), file("some content3"));
     }
 }
