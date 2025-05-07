@@ -35,7 +35,7 @@ mod tests {
     use crate::test_utils::prelude::*;
 
     #[test]
-    fn not_match_nonexist_path() -> Result<()> {
+    fn not_match_nonexistent_path() -> Result<()> {
         let matcher = file_exist();
         let result = matcher.matches("/invalid/path");
         verify_that!(result, eq(MatcherResult::NoMatch))
