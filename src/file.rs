@@ -7,21 +7,19 @@ use anyhow::{Context, Result, anyhow};
 /// First, it checks if the `TEMPRO_HOME` environment variable is set.
 /// If not, it checks for `XDG_CONFIG_HOME` or falls back to `~/.config/tempro`.
 /// It *does not* check if the path exists.
-pub fn get_template_home() -> Option<PathBuf> {
+pub fn get_template_home() -> Result<PathBuf> {
     if let Ok(path) = env::var("TEMPRO_HOME") {
-        return Some(PathBuf::from(path));
+        return Ok(PathBuf::from(path));
     }
 
     let base = if let Ok(xdg) = env::var("XDG_CONFIG_HOME") {
         PathBuf::from(xdg)
     } else {
-        match env::var("HOME") {
-            Ok(home) => PathBuf::from(home).join(".config"),
-            Err(_) => return None,
-        }
+        let home = env::var("HOME")?;
+        PathBuf::from(home).join(".config")
     };
 
-    Some(base.join("tempro"))
+    Ok(base.join("tempro"))
 }
 
 /// Get all template names in the template home.
@@ -71,9 +69,9 @@ mod tests {
                     ("HOME", Some(HOME)),
                 ],
                 || {
-                    assert_eq!(
+                    assert_that!(
                         get_template_home(),
-                        Some(PathBuf::from("/custom/tempro/home"))
+                        pat!(Ok(&PathBuf::from("/custom/tempro/home")))
                     );
                 },
             );
@@ -88,9 +86,9 @@ mod tests {
                     ("HOME", Some(HOME)),
                 ],
                 || {
-                    assert_eq!(
+                    assert_that!(
                         get_template_home(),
-                        Some(PathBuf::from("/custom/xdg/config/tempro"))
+                        pat!(Ok(&PathBuf::from("/custom/xdg/config/tempro")))
                     );
                 },
             );
@@ -105,9 +103,9 @@ mod tests {
                     ("HOME", Some(HOME)),
                 ],
                 || {
-                    assert_eq!(
+                    assert_that!(
                         get_template_home(),
-                        Some(PathBuf::from("/custom/home/.config/tempro"))
+                        pat!(Ok(&PathBuf::from("/custom/home/.config/tempro")))
                     );
                 },
             );
@@ -122,7 +120,7 @@ mod tests {
                     ("HOME", None),
                 ],
                 || {
-                    assert_eq!(get_template_home(), None);
+                    assert_that!(get_template_home(), pat!(Err(_)));
                 },
             );
         }
