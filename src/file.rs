@@ -139,7 +139,7 @@ mod tests {
             let home = temp_dir.path();
 
             let result = get_all_template_names(home).unwrap();
-            assert_that!(&result, empty());
+            assert_that!(result, empty());
         }
 
         #[test]
@@ -152,7 +152,7 @@ mod tests {
             fs::File::create(home.join("template_ignored")).unwrap();
 
             let result = get_all_template_names(home).unwrap();
-            assert_that!(result, {&"template1".to_string(), &"template2".to_string()});
+            assert_that!(result, {"template1", "template2"});
         }
 
         #[test]

@@ -89,8 +89,8 @@ mod tests {
         assert_that!(target_path, dir_exist());
         expect_that!(target_path.join("file.txt"), file("Some content"));
         expect_that!(target_path.join("another_file.txt"), file("Ohter content"));
-        assert_that!(&target_path.join("dir"), dir_exist());
-        expect_that!(&target_path.join("dir/file.txt"), file("Some content"));
+        assert_that!(target_path.join("dir"), dir_exist());
+        expect_that!(target_path.join("dir/file.txt"), file("Some content"));
     }
 
     #[test]
