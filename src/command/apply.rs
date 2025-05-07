@@ -8,7 +8,6 @@ use crate::template::Template;
 
 pub fn handle_apply_command(home: &Path, args: &ApplyArgs) -> Result<()> {
     let current_dir = env::current_dir()?;
-    dbg!(&current_dir);
     let target_dir = current_dir.join(&args.target);
 
     let template = Template::load(&home.join(&args.name))?;
