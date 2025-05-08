@@ -13,7 +13,7 @@ pub fn dir_exist() -> DirExistMatcher {
 #[derive(MatcherBase)]
 pub struct DirExistMatcher;
 
-// TODO: more detailed explaination
+// TODO: more detailed explanation
 impl<T: AsRef<Path> + Debug + Copy> Matcher<T> for DirExistMatcher {
     fn matches(&self, actual: T) -> MatcherResult {
         actual.as_ref().is_dir().into()

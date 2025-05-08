@@ -13,7 +13,7 @@ pub fn file_exist() -> FileExistMatcher {
 #[derive(MatcherBase)]
 pub struct FileExistMatcher;
 
-// TODO: more detailed explaination
+// TODO: more detailed explanation
 impl<T: AsRef<Path> + Debug + Copy> Matcher<T> for FileExistMatcher {
     fn matches(&self, actual: T) -> MatcherResult {
         actual.as_ref().is_file().into()

@@ -78,7 +78,7 @@ mod tests {
         let template_dir = template_path.join(Template::TEMPLATE_DIR);
         fs::create_dir(&template_dir).unwrap();
         fs::write(template_dir.join("file.txt"), "Some content").unwrap();
-        fs::write(template_dir.join("another_file.txt"), "Ohter content").unwrap();
+        fs::write(template_dir.join("another_file.txt"), "Other content").unwrap();
 
         fs::create_dir(template_dir.join("dir")).unwrap();
         fs::write(template_dir.join("dir/file.txt"), "Some content").unwrap();
@@ -102,7 +102,7 @@ mod tests {
 
         assert_that!(target_path, dir_exist());
         expect_that!(target_path.join("file.txt"), file("Some content"));
-        expect_that!(target_path.join("another_file.txt"), file("Ohter content"));
+        expect_that!(target_path.join("another_file.txt"), file("Other content"));
         assert_that!(target_path.join("dir"), dir_exist());
         expect_that!(target_path.join("dir/file.txt"), file("Some content"));
     }
