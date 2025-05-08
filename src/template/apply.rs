@@ -24,6 +24,14 @@ fn copy_dir(src: &Path, dst: &Path) -> Result<()> {
     fs::create_dir_all(dst)
         .with_context(|| format!("failed to create directory: {}", dst.display()))?;
 
+    if dst_is_under_src(src, dst)? {
+        bail!(
+            "destination path {} is inside the source path {}",
+            dst.display(),
+            src.display()
+        );
+    }
+
     for entry in src
         .read_dir()
         .with_context(|| format!("failed to read source directory: {}", src.display()))?
@@ -42,6 +50,12 @@ fn copy_dir(src: &Path, dst: &Path) -> Result<()> {
     }
 
     Ok(())
+}
+
+fn dst_is_under_src(src: &Path, dst: &Path) -> Result<bool> {
+    let src = src.canonicalize()?;
+    let dst = dst.canonicalize()?;
+    Ok(dst.starts_with(src))
 }
 
 #[cfg(test)]
@@ -130,6 +144,14 @@ mod tests {
         let (_home, template) = setup_home();
         let (_temp_dir, target_path) = setup_target();
         fs::create_dir(&target_path).unwrap();
+
+        assert_that!(template.apply(&target_path), err(anything()));
+    }
+
+    #[test]
+    fn target_dir_in_template_path() {
+        let (_home, template) = setup_home();
+        let target_path = template.location().join("template/target");
 
         assert_that!(template.apply(&target_path), err(anything()));
     }
