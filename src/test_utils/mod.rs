@@ -1,6 +1,8 @@
 mod matchers;
 mod template_home;
 
+pub mod temp_wd;
+
 pub use template_home::TemplateHome;
 
 pub mod prelude {

@@ -23,8 +23,8 @@ mod tests {
 
     use tempfile::TempDir;
 
-    use crate::test_utils::TemplateHome;
     use crate::test_utils::prelude::*;
+    use crate::test_utils::{TemplateHome, temp_wd};
 
     fn setup_home() -> TemplateHome {
         let home = TemplateHome::single("test template", Some(r#"description = "Test template""#));
@@ -51,13 +51,13 @@ mod tests {
         let home = setup_home();
         let (temp_dir, target) = setup_target();
 
-        env::set_current_dir(temp_dir.path()).unwrap();
-
-        let args = ApplyArgs {
-            name: "test template".to_string(),
-            target: "target".to_string(),
-        };
-        handle_apply_command(home.path(), &args).unwrap();
+        temp_wd::with_current_dir(temp_dir.path(), || {
+            let args = ApplyArgs {
+                name: "test template".to_string(),
+                target: "target".to_string(),
+            };
+            handle_apply_command(home.path(), &args).unwrap();
+        });
 
         assert_that!(target, dir_exist());
         expect_that!(target.join("file1"), file("some content1"));
